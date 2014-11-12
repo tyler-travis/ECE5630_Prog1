@@ -1,11 +1,21 @@
-x = importdata('cosine.dat');
-xu = importdata('upsample.dat');
-xf = importdata('filtered.dat');
-y = importdata('downsample.dat');
+x = importdata('data/cosine.dat');
+xu = importdata('data/upsample.dat');
+xf = importdata('data/filtered.dat');
+y = importdata('data/downsample.dat');
 
 N = 17700;
 
-figure(1); plot(x); xlim([0 N/100]);
-figure(2); plot(xu); xlim([0 N*3/100]);
-figure(3); plot(xf); xlim([0 N*3/100]);
-figure(4); plot(y); xlim([0 100]);
+Fs = 11025;
+
+% figure(1); plot(x); xlim([0 N/100]);
+% figure(2); plot(xu); xlim([0 N*3/100]);
+% figure(3); plot(xf); xlim([0 N*3/100]);
+% figure(4); plot(y); xlim([0 100]);
+
+X = fft(x);
+nx = (1:N)/N;
+figure(1); plot(nx, abs(X));
+
+Y = fft(y);
+ny = (1:(N*3/4))/(N*3/4);
+figure(2); plot(ny, abs(Y));
