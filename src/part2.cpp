@@ -16,6 +16,7 @@ int main(int argc, char** argv)
   std::ifstream input("coef.dat");  // data file
   double read;
   std::ofstream filter_dat("../data/filter.dat");
+
   // Read in the filter data
   // Setting up as a polyphase filter
   for(int i = 0; i < (Nf/(M*L)+1); ++i)
@@ -23,9 +24,17 @@ int main(int argc, char** argv)
     for(int j = 0; input >> read && j < M*L; ++j)
     {
       h[j][i] = read;
-      filter_dat << j << ": " << read << std::endl;
     }
   }
+
+  for(int i = 0; i < M*L; ++i)
+  {
+    for(int j = 0; j < (Nf/(M*L))+1; ++j)
+    {
+      filter_dat << "h[" << i << "][" << j << "] = " << h[i][j] << std::endl;
+    }
+  }
+
 
   // files to write data to
   std::ofstream x_dat("../data/x.dat");
@@ -53,28 +62,32 @@ int main(int argc, char** argv)
 
     for(int j = 0; j < i && j < Nf/(L*M) + 1; ++j)
     {
-      y0 += x[i-j]     * h[2][j];
-      y0 += x[(i+1)-j] * h[1][j];
-      y0 += x[(i+2)-j] * h[0][j];
-      y0 += x[(i+3)-j] * h[3][j];
+      y2 += x[i] * h[8][j]; // time 0
+      y2 += (i-1 >= 0)?(x[i-1] * h[9][j]):0;
+      y2 += (i-2 >= 0)?(x[i-2] * h[10][j]):0;
+      y2 += (i-3 >= 0)?(x[i-3] * h[11][j]):0;
 
-      y1 += x[i-j]     * h[7][j];
-      y1 += x[(i+1)-j] * h[6][j];
-      y1 += x[(i+2)-j] * h[5][j];
-      y1 += x[(i+3)-j] * h[4][j];
+      y1 += (i-1 >= 0)?(x[i-1] * h[4][j]):0;
+      y1 += (i-2 >= 0)?(x[i-2] * h[5][j]):0;
+      y1 += (i-3 >= 0)?(x[i-3] * h[6][j]):0;
+      y1 += (i-4 >= 0)?(x[i-4] * h[7][j]):0;
 
-      y2 += x[i-j]     * h[8][j];
-      y2 += x[(i+1)-j] * h[11][j];
-      y2 += x[(i+2)-j] * h[10][j];
-      y2 += x[(i+3)-j] * h[9][j];
+      y0 += (i-2 >= 0)?(x[i-2] * h[0][j]):0;
+      y0 += (i-3 >= 0)?(x[i-3] * h[1][j]):0;
+      y0 += (i-4 >= 0)?(x[i-4] * h[2][j]):0;
+      y0 += (i-5 >= 0)?(x[i-5] * h[3][j]):0;
     }
-    y_dat << y0 << std::endl;
-    y_dat << y1 << std::endl;
-    y_dat << y2 << std::endl;
+    std::cout << "i ==================== " << i << std::endl;
+    std::cout << "y0: " << y0 << std::endl;
+    std::cout << "y1: " << y1 << std::endl;
+    std::cout << "y2: " << y2 << std::endl;
     y[index++] = y0;
-    y[index++] = y1;
     y[index++] = y2;
+    y[index++] = y1;
   }
-
+  for(int i = 0; i < N*L/M; ++i)
+  {
+    y_dat << y[i] << std::endl;
+  }
   return 0;
 }

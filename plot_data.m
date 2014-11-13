@@ -14,7 +14,7 @@ Fs = 11025;
 
 X = fft(x);
 nx = (1:N)/N;
-figure(1); subplot(2,1,1); plot(x); xlim([0 N/100]);
+figure(1); subplot(2,1,1); plot(x); xlim([0 100]);
 figure(1); subplot(2,1,2); plot(nx, abs(X));
 
 Y = fft(y);
