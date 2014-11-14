@@ -2,92 +2,177 @@
 #include <cmath>
 #include <cstdlib>
 #include <fstream>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 const int M = 4;       // Downsample
 const int L = 3;       // Upsample
 const int Fs = 11025;  // Sample rate
-const int N = 17700;   // Number of samples
-const int Nf = 177;     // Size of lowpass filter
+const int N = 55200;   // Number of samples
+const int Nf = 552;     // Size of lowpass filter
 
 int main(int argc, char** argv)
 {
   double param = atof(argv[1]);
-  double h[M*L][Nf/(M*L)+1];                     // filter coef
-  std::ifstream input("coef.dat");  // data file
+  //double h[Nf];                     // filter
+  double hs[M*L][Nf/(M*L)];       // subfilters
+  std::ifstream input("coef_new.dat");  // data file
   double read;
-  std::ofstream filter_dat("../data/filter.dat");
+  std::ofstream h0_dat("../data/h0.dat");
+  std::ofstream h1_dat("../data/h1.dat");
+  std::ofstream h2_dat("../data/h2.dat");
+  std::ofstream h3_dat("../data/h3.dat");
+  std::ofstream h4_dat("../data/h4.dat");
+  std::ofstream h5_dat("../data/h5.dat");
+  std::ofstream h6_dat("../data/h6.dat");
+  std::ofstream h7_dat("../data/h7.dat");
+  std::ofstream h8_dat("../data/h8.dat");
+  std::ofstream h9_dat("../data/h9.dat");
+  std::ofstream h10_dat("../data/h10.dat");
+  std::ofstream h11_dat("../data/h11.dat");
 
   // Read in the filter data
   // Setting up as a polyphase filter
-  for(int i = 0; i < (Nf/(M*L)+1); ++i)
+  int n = 0;
+  int m = 0;
+
+  while(!input.eof())
   {
-    for(int j = 0; input >> read && j < M*L; ++j)
+    input >> read;
+    hs[n][m] = read;
+    n++;
+    if(n == M*L)
     {
-      h[j][i] = read;
+      n = 0;
+      m++;
     }
   }
-
-  for(int i = 0; i < M*L; ++i)
+  for(int i = 0; i < Nf/(M*L); ++i)
   {
-    for(int j = 0; j < (Nf/(M*L))+1; ++j)
-    {
-      filter_dat << "h[" << i << "][" << j << "] = " << h[i][j] << std::endl;
-    }
+    h0_dat << hs[0][i] << std::endl;
   }
-
-
+  for(int i = 0; i < Nf/(M*L); ++i)
+  {
+    h1_dat << hs[1][i] << std::endl;
+  }
+  for(int i = 0; i < Nf/(M*L); ++i)
+  {
+    h2_dat << hs[2][i] << std::endl;
+  }
+  for(int i = 0; i < Nf/(M*L); ++i)
+  {
+    h3_dat << hs[3][i] << std::endl;
+  }
+  for(int i = 0; i < Nf/(M*L); ++i)
+  {
+    h4_dat << hs[4][i] << std::endl;
+  }
+  for(int i = 0; i < Nf/(M*L); ++i)
+  {
+    h5_dat << hs[5][i] << std::endl;
+  }
+  for(int i = 0; i < Nf/(M*L); ++i)
+  {
+    h6_dat << hs[6][i] << std::endl;
+  }
+  for(int i = 0; i < Nf/(M*L); ++i)
+  {
+    h7_dat << hs[7][i] << std::endl;
+  }
+  for(int i = 0; i < Nf/(M*L); ++i)
+  {
+    h8_dat << hs[8][i] << std::endl;
+  }
+  for(int i = 0; i < Nf/(M*L); ++i)
+  {
+    h9_dat << hs[9][i] << std::endl;
+  }
+  for(int i = 0; i < Nf/(M*L); ++i)
+  {
+    h10_dat << hs[10][i] << std::endl;
+  }
+  for(int i = 0; i < Nf/(M*L); ++i)
+  {
+    h11_dat << hs[11][i] << std::endl;
+  }
+  
   // files to write data to
   std::ofstream x_dat("../data/x.dat");
   std::ofstream y_dat("../data/y.dat");
 
-  double f0 = 1.0/param;             // frequency
+  double f0 = 1.0/param;         // frequency
   double y[(N*L)/M];             // Upsampled + Downsampled Array
-  double x[N];                   // input signal
+  double x0[N];                // input signal
+  double x1[N];                // input signal
+  double x2[N];                // input signal
+  double x3[N];                // input signal
+  double x4[N];                // input signal
+  double x5[N];                // input signal
+  double ds0[N/M];
+  double ds1[N/M];
+  double ds2[N/M];
+  double ds3[N/M];
+  double ds4[N/M];
+  double ds5[N/M];
   for(int n = 0; n < N; ++n)
   {
-    x[n] = cos(2*M_PI*f0*n);
-    x_dat << x[n] << std::endl;
+    x0[n] = cos(2*M_PI*f0*n);
+    x_dat << x0[n] << std::endl;
   }
+  memcpy(x1 + 1, x0, sizeof(x1));
+  memcpy(x2 + 2, x0, sizeof(x2));
+  memcpy(x3 + 3, x0, sizeof(x3));
+  memcpy(x4 + 4, x0, sizeof(x4));
+  memcpy(x5 + 5, x0, sizeof(x5));
+
   double y0 = 0;
   double y1 = 0;
   double y2 = 0;
-  int index = 0;
+  unsigned int o_index = 0;
+
 
   // Loop through every sample in the signal
   for(int i = 0; i < N; i+=M)
+  {
+    ds0[i/M] = x0[i];
+    ds1[i/M] = x1[i];
+    ds2[i/M] = x2[i];
+    ds3[i/M] = x3[i];
+    ds4[i/M] = x4[i];
+    ds5[i/M] = x5[i];
+  }
+
+  for(int i = 0; i < N/M; ++i)
   {
     y0 = 0;
     y1 = 0;
     y2 = 0;
 
-    for(int j = 0; j < i && j < Nf/(L*M) + 1; ++j)
+    for(int j = 0; j < Nf/(L*M)-1; ++j)
     {
-      y2 += x[i] * h[8][j]; // time 0
-      y2 += (i-1 >= 0)?(x[i-1] * h[9][j]):0;
-      y2 += (i-2 >= 0)?(x[i-2] * h[10][j]):0;
-      y2 += (i-3 >= 0)?(x[i-3] * h[11][j]):0;
+      y0 += ds2[i-j]*hs[0][j];
+      y0 += ds3[i-j]*hs[3][j];
+      y0 += ds4[i-j]*hs[6][j];
+      y0 += ds5[i-j]*hs[9][j];
 
-      y1 += (i-1 >= 0)?(x[i-1] * h[4][j]):0;
-      y1 += (i-2 >= 0)?(x[i-2] * h[5][j]):0;
-      y1 += (i-3 >= 0)?(x[i-3] * h[6][j]):0;
-      y1 += (i-4 >= 0)?(x[i-4] * h[7][j]):0;
+      y1 += ds1[i-j]*hs[1][j];
+      y1 += ds2[i-j]*hs[4][j];
+      y1 += ds3[i-j]*hs[7][j];
+      y1 += ds4[i-j]*hs[10][j];
 
-      y0 += (i-2 >= 0)?(x[i-2] * h[0][j]):0;
-      y0 += (i-3 >= 0)?(x[i-3] * h[1][j]):0;
-      y0 += (i-4 >= 0)?(x[i-4] * h[2][j]):0;
-      y0 += (i-5 >= 0)?(x[i-5] * h[3][j]):0;
+      y2 += ds0[i-j]*hs[2][j];
+      y2 += ds1[i-j]*hs[5][j];
+      y2 += ds2[i-j]*hs[8][j];
+      y2 += ds3[i-j]*hs[11][j];
     }
-    std::cout << "i ==================== " << i << std::endl;
-    std::cout << "y0: " << y0 << std::endl;
-    std::cout << "y1: " << y1 << std::endl;
-    std::cout << "y2: " << y2 << std::endl;
-    y[index++] = y0;
-    y[index++] = y2;
-    y[index++] = y1;
-  }
-  for(int i = 0; i < N*L/M; ++i)
-  {
-    y_dat << y[i] << std::endl;
+
+    y_dat << y0 << std::endl;
+    y_dat << y1 << std::endl;
+    y_dat << y2 << std::endl;
+    y[o_index++] = y0;
+    y[o_index++] = y1;
+    y[o_index++] = y2;
   }
   return 0;
 }

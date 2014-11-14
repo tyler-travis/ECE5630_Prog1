@@ -6,11 +6,12 @@
 const int M = 4;       // Downsample
 const int L = 3;       // Upsample
 const int Fs = 11025;  // Sample rate
-const int N = 17700;   // Number of samples
-const int Nf = 177;     // Size of lowpass filter
+const int N = 55200;   // Number of samples
+const int Nf = 552;     // Size of lowpass filter
 
 int main(int argc, char** argv)
 {
+  double param = atof(argv[1]);
   double h[Nf];                     // filter coef
   std::ifstream input("coef.dat");  // data file
   double read;
@@ -23,12 +24,12 @@ int main(int argc, char** argv)
   }
 
   // files to write data to
-  std::ofstream cosine_dat("../data/cosine.dat");
+  std::ofstream cosine_dat("../data/x.dat");
   std::ofstream filtered_dat("../data/filtered.dat");
   std::ofstream upsample_dat("../data/upsample.dat");
-  std::ofstream downsample_dat("../data/downsample.dat");
+  std::ofstream downsample_dat("../data/y.dat");
 
-  double f0 = 1.0/4;            // frequency
+  double f0 = 1.0/param;            // frequency
   float upSampled[N*L];         // Upsamled Array
   float y[(N*L)/M];             // Upsampled + Downsampled Array
   float filtered[N*L+Nf];       // filtered signal

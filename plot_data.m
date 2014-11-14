@@ -3,7 +3,7 @@ xu = importdata('data/upsample.dat');
 xf = importdata('data/filtered.dat');
 y = importdata('data/y.dat');
 
-N = 17700;
+N = 60632;
 
 Fs = 11025;
 
@@ -14,10 +14,8 @@ Fs = 11025;
 
 X = fft(x);
 nx = (1:N)/N;
-figure(1); subplot(2,1,1); plot(x); xlim([0 100]);
-figure(1); subplot(2,1,2); plot(nx, abs(X));
+figure(1); plot(nx, 20*log10(abs(X)));
 
 Y = fft(y);
 ny = (1:(N*3/4))/(N*3/4);
-figure(2); subplot(2,1,1); plot(y); xlim([0 100]);
-figure(2); subplot(2,1,2); plot(ny, abs(Y));
+figure(2); plot(ny, 20*log10(abs(Y)));
